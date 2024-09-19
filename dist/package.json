@@ -1,0 +1,14 @@
+{
+  "name": "otp-device-sync",
+  "version": "1.0.8",
+  "description": "lib bounded to opt-device-sync infrastructure that gets OTP from devices",
+  "main": "index.cjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jonathan Redouté",
+  "license": "ISC",
+  "dependencies": {
+    "websocket": "^1.0.35"
+  }
+}
