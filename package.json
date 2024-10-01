@@ -3,23 +3,29 @@
   "version": "1.0.0",
   "description": "lib bounded to opt-device-sync infrastruture that gets OTP from devices",
   "scripts": {
-    "build": "tsup --format cjs --dts"
+    "build:prod": "NODE_ENV=production rollup -c",
+    "build:dev": "NODE_ENV=development rollup -c",
+    "build": "npm run build:prod; npm run build:dev"
   },
   "author": "Jonathan Redouté",
   "type": "module",
   "repository": "git@github.com:jredoute/otp-device-sync_lib.git",
   "license": "ISC",
   "devDependencies": {
+    "@rollup/plugin-typescript": "^12.1.0",
     "@tsconfig/node22": "^22.0.0",
     "@types/jest": "^29.5.13",
     "@types/websocket": "^1.0.10",
     "dotenv": "^16.4.5",
     "eslint": "^9.10.0",
     "prettier": "^3.3.3",
+    "rollup-plugin-node-resolve": "^5.2.0",
     "tsup": "^8.3.0",
     "typescript": "^5.6.2"
   },
   "dependencies": {
+    "rollup-plugin-dotenv": "^0.5.1",
+    "tslib": "^2.7.0",
     "websocket": "^1.0.35"
   }
 }

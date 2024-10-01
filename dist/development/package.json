@@ -1,11 +1,13 @@
 {
   "name": "otp-device-sync",
-  "version": "1.0.8",
+  "version": "1.1.7",
   "description": "lib bounded to opt-device-sync infrastructure that gets OTP from devices",
-  "main": "index.cjs",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "homepage": "https://www.otp-device-sync.net",
+  "repository": "git@github.com:jredoute/otp-device-sync_lib.git",
   "author": "Jonathan Redouté",
   "license": "ISC",
   "dependencies": {

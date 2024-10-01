@@ -1,8 +1,33 @@
-import * as websocket from 'websocket'
+var WebSocketClient = require('websocket').client;
 
-const getOTPFromMail = async (email: string, from: string, options?: { verbose?: boolean, timeout?: number }): Promise<string> => {
+const getTimeBasedCode = async (user: string, service: string) => {
+  const req = await fetch(`${process.env.TIMEBASED_SERVER_BASE_URL}/totps?${
+    new URLSearchParams({
+      issuer: service,
+      label: user,
+    })
+  }`)
+
+  const code = await req.text()
+
+  return code
+}
+
+interface MailComponents {
+  codes: string[],
+  links: string[],
+  html: string
+}
+
+const rejectUnauthorized = process.env.NODE_ENV === 'production'
+
+const getMailComponents = async (email: string, from: string, options?: { verbose?: boolean, timeout?: number }): Promise<MailComponents> => {
   return new Promise((resolve, reject) => {
-    const client = new websocket.client()
+    var client = new WebSocketClient({
+      tlsOptions: {
+        rejectUnauthorized
+      }
+    });
 
     client.on('connect', function(connection) {
       try {
@@ -23,10 +48,11 @@ const getOTPFromMail = async (email: string, from: string, options?: { verbose?:
         })
         connection.on('message', function(message) {
           if (message.type === 'utf8') {
+            const data: MailComponents = JSON.parse(message.utf8Data) as MailComponents
             if (options?.verbose) {
-              console.log(`OTP Device Sync | Code received : ${message.utf8Data}`)
+              console.log(`OTP Device Sync | Codes received : ${data.codes.join(', ')}`)
             }
-            resolve(message.utf8Data)
+            resolve(data)
           }
         })
       } catch (e) {
@@ -47,7 +73,7 @@ const getOTPFromMail = async (email: string, from: string, options?: { verbose?:
     })
     
     try {
-      client.connect(`ws://${process.env.MAIL_SERVER_HOST}:${process.env.MAIL_SERVER_PORT}?email=${email}&from=${from}`, 'echo-protocol')
+      client.connect(`${process.env.MAIL_SERVER_BASE_URL}?email=${encodeURIComponent(email)}&from=${encodeURIComponent(from)}`, 'echo-protocol')
     } catch (e) {
       reject(e)
     }
@@ -61,5 +87,6 @@ const getOTPFromMail = async (email: string, from: string, options?: { verbose?:
 }
 
 export {
-  getOTPFromMail
+  getMailComponents,
+  getTimeBasedCode
 }
