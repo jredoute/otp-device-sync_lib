@@ -2,15 +2,14 @@
 
 ## installing for dev purpose
 
-clone the repo
+1. clone the repo
 
-```npm i```
+2. ```npm i```
 
-Considering OTP Device Sync server (https://github.com/jredoute/otp-device-sync_mail_api), define a `.env` with two variables :
+Considering OTP Device Sync server (https://github.com/jredoute/otp-device-sync_mail_api), define a `.env.development` with :
 
-- MAIL_SERVER_HOST is the host of the server
-- MAIL_SERVER_PORT is the port of the server
+- MAIL_SERVER_BASE_URL, the url of the api (ws)
 
 ## build a client lib
 
-build with `npm run build`, the `/dist` directory will contain a ready-to-publish OTP Devide Sync client
+build with `npm run build:dev`, the `/dist/development` directory will contain a ready-to-publish OTP Devide Sync client
