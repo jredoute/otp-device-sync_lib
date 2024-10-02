@@ -1,6 +1,6 @@
 node_modules
 dist/production/index.js
-dist/production/index.d.cts
+dist/production/index.d.ts
 dist/development/index.js
-dist/development/index.d.cts
+dist/development/index.d.ts
 .env*
