@@ -31,6 +31,7 @@ const getMailComponents = async (email, from, options = { verbose: false });
 - **options** (object, optional):
   - **verbose** (boolean): If enabled, outputs additional information to the console (useful for debugging). By default, this option is disabled (`false`).
   - **timeout** (number): Throw error after the specified number of millisecond if no OTP is retrieved. By default, this option is set to wait forever (`0`).
+  - **registeredKey** (number): access token to use with associated (service, user) pair
 
 
 ### Example with Playwright

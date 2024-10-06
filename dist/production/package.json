@@ -1,6 +1,6 @@
 {
   "name": "otp-device-sync",
-  "version": "1.1.8",
+  "version": "1.1.10",
   "description": "lib bounded to opt-device-sync infrastructure that gets OTP from devices",
   "main": "index.js",
   "scripts": {

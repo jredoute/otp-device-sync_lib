@@ -1,16 +1,37 @@
 var WebSocketClient = require('websocket').client;
 
-const getTimeBasedCode = async (user: string, service: string) => {
-  const req = await fetch(`${process.env.TIMEBASED_SERVER_BASE_URL}/totps?${
-    new URLSearchParams({
+const getTimeBasedCode = async (user: string, service: string, options?: { verbose?: boolean, registeredKey?: string }) => {
+
+  try {
+    const qs = new URLSearchParams({
       issuer: service,
       label: user,
     })
-  }`)
+  
+    if (options?.registeredKey) {
+      qs.set('registeredKey', options?.registeredKey)
+    }
+  
+    if (options?.verbose) {
+      console.log('OTP Device Sync | Querying virtual time based code generation application');
+    }
 
-  const code = await req.text()
-
-  return code
+    const req = await fetch(`${process.env.TIMEBASED_SERVER_BASE_URL}/totps?${qs}`)
+  
+    const code = await req.text()
+  
+    if (options?.verbose) {
+      console.log(`OTP Device Sync | Code received : ${code}`)
+    }
+    
+    return code
+  } catch (ex) {
+    if (options?.verbose) {
+      console.log('OTP Device Sync | Error', ex)
+    }
+    throw ex
+  }
+  
 }
 
 interface MailComponents {
@@ -21,7 +42,7 @@ interface MailComponents {
 
 const rejectUnauthorized = process.env.NODE_ENV === 'production'
 
-const getMailComponents = async (email: string, from: string, options?: { verbose?: boolean, timeout?: number }): Promise<MailComponents> => {
+const getMailComponents = async (email: string, from: string, options?: { verbose?: boolean, timeout?: number, registeredKey?: string }): Promise<MailComponents> => {
   return new Promise((resolve, reject) => {
     var client = new WebSocketClient({
       tlsOptions: {
@@ -32,7 +53,7 @@ const getMailComponents = async (email: string, from: string, options?: { verbos
     client.on('connect', function(connection) {
       try {
         if (options?.verbose) {
-          console.log('OTP Device Sync | Connected');
+          console.log(`OTP Device Sync | Watching incoming mails from ${from} to ${email}`);
         }
         connection.on('error', function(error) {
           if (options?.verbose) {
@@ -58,9 +79,9 @@ const getMailComponents = async (email: string, from: string, options?: { verbos
       } catch (e) {
         if (options?.verbose) {
           if (e instanceof Error) {
-            console.log(`OTP Device Sync | Error : ${e.toString()}` )
+            console.log(`OTP Device Sync | Error Init : ${e.toString()}` )
           } else {
-            console.log(`OTP Device Sync | Error :`, e)
+            console.log(`OTP Device Sync | Error Init :`, e)
           }
         }
         reject(e)
@@ -68,13 +89,26 @@ const getMailComponents = async (email: string, from: string, options?: { verbos
     })
 
     client.on('connectFailed', function (error) {
-      console.log('ici', error)
+      if (options?.verbose) {
+        console.log(`OTP Device Sync | Connection Failed :`, error)
+      }
       reject(error)
     })
     
     try {
-      client.connect(`${process.env.MAIL_SERVER_BASE_URL}?email=${encodeURIComponent(email)}&from=${encodeURIComponent(from)}`, 'echo-protocol')
+      const qs = new URLSearchParams({
+        email,
+        from
+      })
+
+      if (options?.registeredKey) {
+        qs.set('registeredKey', options?.registeredKey)
+      }
+      client.connect(`${process.env.MAIL_SERVER_BASE_URL}?${qs}`, 'echo-protocol')
     } catch (e) {
+      if (options?.verbose) {
+        console.log(`OTP Device Sync | Error Connecting :`, e)
+      }
       reject(e)
     }
 
